@@ -1,0 +1,15 @@
+# Assembly build artifacts (regenerable via build.sh / asm_build.sh) --
+# scoped to loader/ and examples/ so rom/Profi5E.BIN (the original
+# reference dump, which should stay versioned) isn't caught too.
+loader/*.bin
+loader/*.lst
+loader/*.p
+examples/*.bin
+examples/*.lst
+examples/*.p
+
+# Python
+__pycache__/
+
+# Local Claude Code settings (machine-specific, not project config)
+.claude/
