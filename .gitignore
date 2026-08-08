@@ -8,6 +8,14 @@ examples/*.bin
 examples/*.lst
 examples/*.p
 
+# ...except the prebuilt binaries committed on purpose, so the project can
+# be used (burn the loader, run the examples) with zero build tooling --
+# see README.md "Just want to use it" section.
+!loader/loader_2764.bin
+!loader/loader_27128.bin
+!examples/hiworld.bin
+!examples/scroll_text.bin
+
 # Python
 __pycache__/
 

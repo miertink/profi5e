@@ -1,9 +1,16 @@
 # Setup Tutorial: Installing the Toolchain on Windows
 
 This is a from-scratch, step-by-step guide for installing everything needed
-to build and use this project — written for people with **no prior
-command-line or programming-tool experience**. It assumes nothing is
-installed yet.
+to **write or modify** PROFI-5E programs for this project — written for
+people with **no prior command-line or programming-tool experience**. It
+assumes nothing is installed yet.
+
+**Not sure you need this at all?** If you just want to burn the loader and
+try the example programs as they are, you don't — the repository already
+includes prebuilt `.bin` files for the loader and both examples, and that
+path only needs Python (see README.md "Just want to use it?"). This guide
+is for the next step: changing `loader.asm`, changing an example, or
+writing your own program from scratch.
 
 You'll install two things:
 

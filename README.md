@@ -27,39 +27,57 @@ serial framing): **[docs/Profi5E_Hardware_Reference.md](docs/Profi5E_Hardware_Re
 Not yet started: a BIN→WAV encoder for the monitor's cassette-tape format,
 as a hardware-free alternative loading path (see PROJECT.md Roadmap).
 
-## Requirements
+There are two ways to use this project, needing different things installed:
 
-- **Assembler:** [Macro Assembler AS](https://github.com/Macroassembler-AS/asl-releases)
-  (`asl` + `p2bin`) on `PATH`.
-- **Python 3** with [`pyserial`](https://pypi.org/project/pyserial/)
-  (`pip install pyserial`).
-- A PROFI-5E board with the expansion EPROM socket populated, and a 5V
-  USB-TTL serial adapter wired to SID/SOD (see Hardware Reference §9).
+## Just want to use it? (no assembler needed)
 
-New to the command line, or don't have `asl`/`p2bin`/Python installed yet?
-**[docs/Setup_Tutorial.md](docs/Setup_Tutorial.md)** is a from-scratch,
-no-experience-assumed walkthrough for installing all of the above on
-Windows.
+Burn a **prebuilt** loader image, then load the **prebuilt** example
+programs — nothing here needs `asl`/`p2bin`, only Python.
 
-## Quickstart
+**Requirements:** Python 3 with [`pyserial`](https://pypi.org/project/pyserial/)
+(`pip install pyserial`); a PROFI-5E with the expansion EPROM socket
+populated and a 5V USB-TTL serial adapter wired to SID/SOD (Hardware
+Reference §9).
 
-Build the loader and burn it to an EPROM in the expansion socket:
+1. Burn one of the prebuilt loader images to an EPROM in the expansion
+   socket, matching the chip you actually have:
+   - `loader/loader_2764.bin` — 8 KB, for a **2764** (the chip this socket
+     officially documents, jumper B1 pins 3-4).
+   - `loader/loader_27128.bin` — 16 KB, for a **27128** instead (not
+     officially documented for this socket, but confirmed working — see
+     Hardware Reference §7; mainly useful if, like this project's own board,
+     you have 27128s on hand and few/no 2764s).
+2. Set the board's DIL switches (Hardware Reference §6 for the full table):
+   - **Switch 5 = OFF** (no serial handshake)
+   - **Switch 6 = OFF** (V.24/serial output, not Centronics)
+   - **Switch 7/8** = desired baud rate, must match `--baud` below
+   - **Switch 4 = OFF** for auto-boot into the loader on power-up (otherwise
+     start it manually — Hardware Reference §5.3)
+3. Load a prebuilt example:
+   ```sh
+   python tools/profi5e_load.py examples/hiworld.bin --port COM4 --addr 8000
+   python tools/profi5e_load.py examples/scroll_text.bin --port COM4 --addr 8000
+   ```
+   (One at a time — both are built for the same default address, 8000h.)
+
+## Want to write or modify a program? (needs the assembler)
+
+Editing `loader.asm`, `examples/*.asm`, or writing your own `.asm` all need
+`asl` + `p2bin` on `PATH` to turn source into a `.bin`. New to the command
+line, or don't have them installed? **[docs/Setup_Tutorial.md](docs/Setup_Tutorial.md)**
+is a from-scratch, no-experience-assumed walkthrough (includes a prebuilt
+`asl`/`p2bin` download, so you don't have to compile them yourself either).
+
+Rebuild the loader (only needed if you change `loader.asm` — the prebuilt
+`.bin`s above are already this exact source):
 
 ```sh
 cd loader
-./build.sh          # -> loader.bin, 8 KB, for a 2764 (the documented chip for this socket)
-./build.sh 27128    # -> loader.bin, 16 KB, for a 27128 instead (see Hardware Reference §7)
+./build.sh          # -> loader.bin, 8 KB, for a 2764
+./build.sh 27128    # -> loader.bin, 16 KB, for a 27128 instead
 ```
 
-Set the board's DIL switches (see Hardware Reference §6 for the full table):
-
-- **Switch 5 = OFF** (no serial handshake)
-- **Switch 6 = OFF** (V.24/serial output, not Centronics)
-- **Switch 7/8** = desired baud rate, must match `--baud` below
-- **Switch 4 = OFF** for auto-boot into the loader on power-up (otherwise
-  start it manually — Hardware Reference §5.3)
-
-Build and load an example program:
+Build and load your own program (or a modified example):
 
 ```sh
 python tools/profi5e_build.py examples/hiworld.asm --addr 8000

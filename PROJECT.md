@@ -40,6 +40,10 @@ expansion socket) receives and checksums it → runs it automatically.
   its output must be loaded with the same `--addr` on `profi5e_load.py`
   (see Repository structure below).
 - `examples/hiworld.asm`, `examples/scroll_text.asm` — working demo programs.
+- Prebuilt `.bin`s committed for both the loader (both chip variants) and
+  both examples, so burning the EPROM and loading the examples needs no
+  assembler at all — only Python (see README.md "Just want to use it?").
+  `asl`/`p2bin` are only needed to modify the loader or write new programs.
 - Local `asl`/`p2bin` toolchain built from source, installed at
   `C:\tools\asl\bin` (see Toolchain section).
 
@@ -68,6 +72,8 @@ profi5e/
 │   └── Profi5E.BIN                 # monitor ROM dump read from this board's own EPROM — reference, do not modify
 ├── loader/
 │   ├── loader.asm                  # serial loader, ORG 2000h — done, validated on hardware
+│   ├── loader_2764.bin             # prebuilt, 8 KB, for a 2764 (committed, no assembler needed)
+│   ├── loader_27128.bin            # prebuilt, 16 KB, for a 27128 (committed, no assembler needed)
 │   └── build.sh                    # asl → p2bin → 8 KB EPROM image (2764, default) or 16 KB (27128, `./build.sh 27128`)
 ├── tools/
 │   ├── dis85.py                    # 8085 disassembler used to produce the .lst
@@ -78,7 +84,9 @@ profi5e/
 │   └── bin2wav.py                  # cassette encoder — phase 2, not started
 └── examples/
     ├── hiworld.asm                 # "hi-world" on the display, default ORG 8000h, loaded via the serial loader
-    └── scroll_text.asm             # scrolls "NOTHING IS CERTAIN" across the display, default ORG 8000h
+    ├── hiworld.bin                 # prebuilt, for --addr 8000 (committed, no assembler needed)
+    ├── scroll_text.asm             # scrolls "NOTHING IS CERTAIN" across the display, default ORG 8000h
+    └── scroll_text.bin             # prebuilt, for --addr 8000 (committed, no assembler needed)
 ```
 
 Both examples default to `ORG 8000h` via a `LOADADDR` EQU, not a hardcoded `ORG`.
