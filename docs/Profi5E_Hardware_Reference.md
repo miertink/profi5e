@@ -322,19 +322,23 @@ from the TX routine's disassembly).
 | BR5 | closed (BR3, BR4 open) | CMOS-RAM **6264** |
 | **BR4** | **must never be closed** | explicit manufacturer warning, on both the manual and the schematic |
 
-**This board's actual configuration:** a 27128 (16 KB) is fitted in socket
-I14, confirmed working after the user closed the jumper positions documented
-as "B1 pins 3-4" and "B2 pins 1-2". Neither the manual nor the schematic
-documents a 27128 option by name (both only go up to 2764/6264) — the
-official jumper table above should be taken as reference for the *documented*
-chip family, not as a literal description of this board's actual bridging.
-**Empirically confirmed:** socket address line A13 is tied to VCC, so only
-the *upper* 8 KB of the 27128 (chip-internal 2000h–3FFFh) is reachable by the
-CPU, mapped to bus address 2000h–3FFFh — consistent with the memory map, which
-only ever reserved 8 KB for this socket regardless of the physical chip's
-capacity. Any code assembled with `ORG 2000h` must be placed at **offset
-2000h** within the 16 KB image written to the chip, not offset 0 (see
-`tools/asm_build.sh`).
+**Officially documented / recommended chip: 2764 (8 KB)**, jumper B1 pins
+3-4. This is the loader's default build target (`loader/build.sh`, no
+arguments): `ORG 2000h` maps directly to file offset 0, the whole 8 KB chip
+is addressable, no padding or offset trick needed.
+
+**This project's own board is instead fitted with a 27128 (16 KB)** in
+socket I14, using the same jumper positions as the 2764 ("B1 pins 3-4",
+"B2 pins 1-2") — purely a convenience choice (many 27128s on hand, only a
+couple of 2764s), not a hardware requirement. Neither the manual nor the
+schematic documents a 27128 option by name for this socket (both only go up
+to 2764/6264). **Empirically confirmed:** socket address line A13 is tied to
+VCC, so only the *upper* 8 KB of the 27128 (chip-internal 2000h–3FFFh) is
+reachable by the CPU, mapped to bus address 2000h–3FFFh — consistent with the
+memory map, which only ever reserved 8 KB for this socket regardless of the
+physical chip's capacity. Code assembled with `ORG 2000h` must be placed at
+**offset 2000h** within the 16 KB image written to the chip, not offset 0.
+Build this variant with `loader/build.sh 27128` (see `tools/asm_build.sh`).
 
 ---
 

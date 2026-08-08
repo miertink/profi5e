@@ -24,7 +24,7 @@ assembly code.**
 ## Current status
 
 **Working end to end on real hardware:** `profi5e_load.py` sends a file over
-USB-serial (adapter on SID/SOD) → `loader.asm` (burned to a 27128 in the
+USB-serial (adapter on SID/SOD) → `loader.asm` (burned to an EPROM in the
 expansion socket) receives and checksums it → runs it automatically.
 
 - `loader/loader.asm` — 171 bytes, 0 errors/warnings. Calls the monitor
@@ -68,7 +68,7 @@ profi5e/
 │   └── Profi5E.BIN                 # monitor ROM dump read from this board's own EPROM — reference, do not modify
 ├── loader/
 │   ├── loader.asm                  # serial loader, ORG 2000h — done, validated on hardware
-│   └── build.sh                    # asl → p2bin → 16 KB buffer, code at offset 2000h
+│   └── build.sh                    # asl → p2bin → 8 KB EPROM image (2764, default) or 16 KB (27128, `./build.sh 27128`)
 ├── tools/
 │   ├── dis85.py                    # 8085 disassembler used to produce the .lst
 │   ├── asm_build.sh                # generic asl/p2bin wrapper — used by loader/build.sh
@@ -120,10 +120,15 @@ every successful build, as a reminder.
 - **EPROM image:** binary assembled with `ORG 2000h`. Byte 0 of the output
   file = bus address 2000h; if the programmer wants Intel HEX, apply a
   −2000h offset (not needed loading the raw `.bin`, e.g. via XGPro).
-  Padded/placed by `tools/asm_build.sh` to a 16 KB buffer with the code at
-  offset 2000h — **not** offset 0 (see Hardware Reference §7, socket A13 is
-  tied to VCC, so only the chip's upper half is addressable).
-- **Programming:** EPROM **27128** (16 KB), TL866 programmer + **XGPro**.
+  `loader/build.sh` defaults to an 8 KB image (chip **2764**, the officially
+  documented option, jumper B1 pins 3-4) with the code at offset 0. Pass
+  `27128` (`./build.sh 27128`) for a 16 KB image instead, with the code at
+  offset 2000h — **not** offset 0 — since that chip's A13 pin is tied to
+  VCC on this socket, making only its upper half addressable (Hardware
+  Reference §7).
+- **Programming:** TL866 programmer + **XGPro**. This project's own board
+  uses a 27128 out of convenience (see Hardware Reference §7); 2764 is the
+  officially documented and default-built option.
 - **PC:** Python 3 + pyserial.
 - **PDF processing:** `poppler` (`pdftoppm`/`pdftotext`), installed via
   MSYS2/pacman at `C:\msys64\mingw64\bin` (on PATH) — needed for scanned

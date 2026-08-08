@@ -1,13 +1,25 @@
 #!/bin/sh
-# Assembles loader.asm and produces the 16 KB image to burn on the
-# expansion EPROM (chip: 27128, 16 KB).
+# Assembles loader.asm and produces the image to burn on the expansion
+# EPROM (socket I14).
 #
-# IMPORTANT: on this board, the expansion socket's A13 pin is tied to
-# VCC, so only the UPPER half of the chip (offset 2000h-3FFFh) is
-# visible to the CPU at 2000h-3FFFh -- the lower half (0000h-1FFFh)
-# is physically unreachable. That's why the code (assembled with
-# ORG 2000h) goes at offset 8192 (2000h) of the 16 KB file, not
-# offset 0.
+# Usage: ./build.sh [27128]
+#
+# Default target: EPROM 2764 (8 KB) -- the chip family the manual and
+# schematic actually document for this socket (jumper B1 pins 3-4).
+# ORG 2000h maps directly to file offset 0, no padding trick needed.
+#
+# Pass "27128" to build for a 16 KB 27128 instead -- not officially
+# documented for this socket, but empirically confirmed to work (see
+# Hardware Reference #7); mainly useful if, like this project's own
+# board, you have 27128s on hand and few/no 2764s. On this socket the
+# A13 pin is tied to VCC, so only the chip's UPPER half
+# (offset 2000h-3FFFh) is visible to the CPU -- the code (ORG 2000h)
+# must go at file offset 8192 (2000h), not offset 0.
 set -e
 cd "$(dirname "$0")"
-../tools/asm_build.sh loader.asm 16384 8192
+
+if [ "$1" = "27128" ]; then
+    ../tools/asm_build.sh loader.asm 16384 8192
+else
+    ../tools/asm_build.sh loader.asm 8192 0
+fi

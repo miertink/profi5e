@@ -47,7 +47,8 @@ Build the loader and burn it to an EPROM in the expansion socket:
 
 ```sh
 cd loader
-./build.sh          # -> loader.bin, 16 KB, ready to burn at chip offset 0
+./build.sh          # -> loader.bin, 8 KB, for a 2764 (the documented chip for this socket)
+./build.sh 27128    # -> loader.bin, 16 KB, for a 27128 instead (see Hardware Reference §7)
 ```
 
 Set the board's DIL switches (see Hardware Reference §6 for the full table):

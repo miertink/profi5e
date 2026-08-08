@@ -10,12 +10,13 @@
 #   and copies the assembled code into it at the given chip_offset
 #   (default 0 if omitted).
 #
-#   On this board's expansion socket (27128), the chip's A13 pin is
-#   tied to VCC -- only the chip's upper half (offset 2000h-3FFFh) is
-#   addressable by the CPU (at bus 2000h-3FFFh). That's why
-#   loader/build.sh calls this with chip_offset=8192 (2000h): the code
-#   (assembled with ORG 2000h) needs to sit in the UPPER half of the
-#   16 KB file, not at the start.
+#   loader/build.sh uses this to produce the expansion-EPROM image:
+#   an 8 KB image at offset 0 by default (chip: 2764, the officially
+#   documented option for this socket), or a 16 KB image with the code
+#   at offset 8192 (2000h) if built for a 27128 instead -- on this
+#   socket, a 27128's A13 pin is tied to VCC, so only its upper half
+#   (offset 2000h-3FFFh) is reachable by the CPU. See loader/build.sh
+#   and Hardware Reference #7 for the full explanation.
 #
 # Set LOADADDR (env var) to override where the code is assembled to run
 # from, for sources that declare their ORG via a LOADADDR EQU (see
