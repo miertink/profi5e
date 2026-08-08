@@ -36,6 +36,11 @@ as a hardware-free alternative loading path (see PROJECT.md Roadmap).
 - A PROFI-5E board with the expansion EPROM socket populated, and a 5V
   USB-TTL serial adapter wired to SID/SOD (see Hardware Reference §9).
 
+New to the command line, or don't have `asl`/`p2bin`/Python installed yet?
+**[docs/Setup_Tutorial.md](docs/Setup_Tutorial.md)** is a from-scratch,
+no-experience-assumed walkthrough for installing all of the above on
+Windows.
+
 ## Quickstart
 
 Build the loader and burn it to an EPROM in the expansion socket:
