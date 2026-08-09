@@ -21,8 +21,10 @@ serial framing): **[docs/Profi5E_Hardware_Reference.md](docs/Profi5E_Hardware_Re
 3. **`tools/profi5e_build.py`** — assembles an `examples/*.asm` source for a
    chosen RAM address, so its output lines up with the `--addr` given to
    `profi5e_load.py`.
-4. **`examples/`** — small demo programs (7-segment display output) that
-   exercise the loader end to end.
+4. **`examples/`** — small demo programs that exercise the loader end to
+   end: two use only the onboard 7-segment display (`hiworld.asm`,
+   `scroll_text.asm`); a third (`switch_leds.asm`) drives an external
+   switches/LEDs I/O board via the 64-pin expansion connector.
 
 Not yet started: a BIN→WAV encoder for the monitor's cassette-tape format,
 as a hardware-free alternative loading path (see PROJECT.md Roadmap).
@@ -88,12 +90,17 @@ Reference §9).
    - **Switch 7/8** = desired baud rate, must match `--baud` below
    - **Switch 4 = OFF** for auto-boot into the loader on power-up (otherwise
      start it manually — Hardware Reference §5.3)
-3. Load a prebuilt example:
+3. Load a prebuilt example (one at a time — all three are built for the
+   same default address, 8000h):
    ```sh
    python tools/profi5e_load.py examples/hiworld.bin --port COM4 --addr 8000
    python tools/profi5e_load.py examples/scroll_text.bin --port COM4 --addr 8000
+   python tools/profi5e_load.py examples/switch_leds.bin --port COM4 --addr 8000
    ```
-   (One at a time — both are built for the same default address, 8000h.)
+   `switch_leds.bin` needs an external 8-switch/8-LED I/O board connected
+   via the 64-pin expansion connector (populated only on full builds) — see
+   Hardware Reference §3 "External I/O board" for the wiring it assumes.
+   The other two only need the base board.
 
 ## Want to write or modify a program? (needs the assembler)
 

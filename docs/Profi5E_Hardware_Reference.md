@@ -143,6 +143,20 @@ Full pin table lives in the manual (§8.1); relevant summary: all 24 8255 #1/#2
 lines are broken out, plus +5V (pin a3), 0V (pins a1/a2), and INT (pin b32,
 wired to RST 7.5 via the dedicated hardware interrupt button).
 
+### External I/O board ("E-A-8", switches + LEDs)
+
+Training.pdf §4.3 describes the standard training accessory: an 8-switch /
+8-LED unit connected via the 64-pin connector. Its wiring to I/O-Baustein 1
+(8255 #1) is fixed by the accessory itself, not configurable: **switches on
+Kanal B (port 01h, input)**, **LEDs on Kanal C (port 02h, output)**. Control
+word to set that direction split (Kanal A=out, Kanal B=in, Kanal C=out, all
+4 bits of each C nibble): **82h**, written to the control register (port
+03h) — from the same control-word table as the RESET/self-test defaults
+above (92h / 80h), decoded per Training.pdf §4.2:
+bit7=1 (mode set) · bit4=0 (Kanal A out) · bit3=0 (Kanal C 4-7 out) ·
+bit1=1 (Kanal B in) · bit0=0 (Kanal C 0-3 out). Used by
+`examples/switch_leds.asm`.
+
 ---
 
 ## 4. Interrupt vectors (8085)

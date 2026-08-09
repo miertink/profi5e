@@ -15,6 +15,7 @@ examples/*.p
 !loader/loader_27128.bin
 !examples/hiworld.bin
 !examples/scroll_text.bin
+!examples/switch_leds.bin
 
 # Python
 __pycache__/

@@ -39,10 +39,13 @@ expansion socket) receives and checksums it → runs it automatically.
 - `tools/profi5e_build.py` — assembles a `.asm` for a given RAM `--addr`;
   its output must be loaded with the same `--addr` on `profi5e_load.py`
   (see Repository structure below).
-- `examples/hiworld.asm`, `examples/scroll_text.asm` — working demo programs.
+- `examples/hiworld.asm`, `examples/scroll_text.asm` — display-only demo
+  programs. `examples/switch_leds.asm` — mirrors an external I/O board's 8
+  switches onto its 8 LEDs via the 64-pin connector (8255 #1, Hardware
+  Reference §3 "External I/O board").
 - Prebuilt `.bin`s committed for both the loader (both chip variants) and
-  both examples, so burning the EPROM and loading the examples needs no
-  assembler at all — only Python (see README.md "Just want to use it?").
+  all three examples, so burning the EPROM and loading the examples needs
+  no assembler at all — only Python (see README.md "Just want to use it?").
   `asl`/`p2bin` are only needed to modify the loader or write new programs.
 - Local `asl`/`p2bin` toolchain built from source, installed at
   `C:\tools\asl\bin` (see Toolchain section).
@@ -87,7 +90,9 @@ profi5e/
     ├── hiworld.asm                 # "hi-world" on the display, default ORG 8000h, loaded via the serial loader
     ├── hiworld.bin                 # prebuilt, for --addr 8000 (committed, no assembler needed)
     ├── scroll_text.asm             # scrolls "NOTHING IS CERTAIN" across the display, default ORG 8000h
-    └── scroll_text.bin             # prebuilt, for --addr 8000 (committed, no assembler needed)
+    ├── scroll_text.bin             # prebuilt, for --addr 8000 (committed, no assembler needed)
+    ├── switch_leds.asm             # mirrors an external I/O board's switches onto its LEDs, default ORG 8000h
+    └── switch_leds.bin             # prebuilt, for --addr 8000 (committed, no assembler needed)
 ```
 
 Both examples default to `ORG 8000h` via a `LOADADDR` EQU, not a hardcoded `ORG`.
@@ -149,7 +154,7 @@ every successful build, as a reminder.
 `loader/loader.asm` (protocol:
 `[55h sync][AAh][flags][addr_lo][addr_hi][len_lo][len_hi][payload…][chk]`,
 `chk` = sum mod 256 of the payload, ACK=06h/NAK=15h, `flags` bit0 = GO),
-`tools/profi5e_load.py`, and both example programs.
+`tools/profi5e_load.py`, and all three example programs.
 
 **Phase 2:** `tools/bin2wav.py`, a BIN→WAV encoder for the monitor's
 cassette format, deriving exact timings from routines 0B80h/0C60h (already
