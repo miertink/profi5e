@@ -426,7 +426,41 @@ upstream of all that analog conditioning.
 Connect a standard 5V USB-TTL adapter directly: adapter TXD → SID, adapter
 RXD → SOD, GND common. No level shifter needed. Confirmed empirically: VCC=5V,
 SOD idle ≈3V (a valid logic-high, reduced by the R24/R31→I9/I16 loading that
-stays in parallel — not a fault).
+stays in parallel — not a fault). See README.md for photos of this project's
+own physical connection.
+
+### I9 and the SID contention question
+
+I9 (LM224 quad op-amp) has one section — pin 14, the "D" op-amp of the
+package — wired to the same electrical net as SID, as part of converting
+the DB9 connector's incoming RS232-level signal down to TTL for the 8085.
+With a USB-TTL adapter driving SID directly and I9 still seated, two output
+drivers can end up on the same net — not electrically clean, though this
+project's own board has run this way in practice without observed issues
+(no device plugged into the physical V.24 port at the same time). SOD has
+no equivalent problem: the adapter's RXD and I9/I16's inputs are just two
+listeners on the 8085's own output pin, not competing drivers (this is the
+R24/R31 loading noted above).
+
+Three options, in order of preference, since I9 is socketed (not soldered):
+
+1. **Pull I9 from its socket (recommended).** Costs nothing, instantly
+   reversible, eliminates the contention risk on SID entirely. Side effect:
+   disables the physical V.24 port completely while I9 is out. No other
+   documented function on this board depends on I9 — the cassette interface
+   is purely digital, driven straight from 8255 ports (§10), not through any
+   op-amp — but this hasn't been independently re-verified pin-by-pin
+   against the schematic in this pass, so a quick visual check before
+   pulling it is worth doing if in doubt.
+2. **Lift only pin 14** (bend it out of the socket, or trim it) instead of
+   removing the whole chip. More surgical — disables just the SID-side
+   receiver section, leaves the rest of I9 and the V.24 port's transmit
+   side (driven by I15/I16, from SOD) untouched. Slightly fiddlier to do
+   without stressing the socket contact or the pin itself.
+3. **Leave I9 seated.** Works — this is what this project's own board
+   currently does — but carries the contention risk above, especially if a
+   real RS232 device is ever plugged into the physical V.24 connector at
+   the same time as the USB-TTL adapter.
 
 **Framing:** 8N1... actually 8N2 (2 stop bits, see §6), LSB-first, idle-high,
 start-bit-low — standard non-inverted UART, matching a generic USB-TTL

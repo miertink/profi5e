@@ -64,6 +64,7 @@ profi5e/
 ├── docs/
 │   ├── Profi5E_Hardware_Reference.md   # all hardware facts — read first
 │   ├── Profi5E_disassembly.lst         # full ROM disassembly
+│   ├── Profi-5E_1.jpeg / Profi-5E_2.jpeg          # this board's USB-TTL/SID/SOD wiring, shown in README
 │   ├── Profi-5E_SW.pdf / Profi-5E_COL.pdf         # official schematic (SW processed, COL redundant)
 │   ├── Profi-5E Bedienungsanleitung.pdf           # official manual (processed)
 │   ├── Profi-5E Training.pdf                      # exercise workbook (processed)

@@ -27,6 +27,41 @@ serial framing): **[docs/Profi5E_Hardware_Reference.md](docs/Profi5E_Hardware_Re
 Not yet started: a BIN→WAV encoder for the monitor's cassette-tape format,
 as a hardware-free alternative loading path (see PROJECT.md Roadmap).
 
+## Wiring: connecting a USB-TTL adapter to SID/SOD
+
+The loader talks over the 8085's own **SID**/**SOD** pins directly, not
+through the board's V.24 DB9 connector (see Hardware Reference §9 for the
+electrical reasoning). A plain 5V USB-TTL adapter (TXD/RXD/GND, no level
+shifter needed) connects like this:
+
+- adapter **TXD** → **SID**
+- adapter **RXD** → **SOD**
+- adapter **GND** → board **GND**
+
+**I9 (the op-amp that drives the physical V.24 connector) shares its input
+with SID.** Left in its socket, it can end up fighting the adapter's own
+drive on that same line — not electrically clean, even though this
+project's own board has run this way in practice without issue. Since I9
+is socketed, not soldered, the cleanest fix costs nothing: **pull it out**
+(reversible any time by plugging it back in). See Hardware Reference §9
+for the full reasoning and two more conservative alternatives (lifting
+only I9's pin 14, or leaving it seated).
+
+This project's own board uses solder-in pin headers at accessible PCB via
+points as permanent tap points, so the adapter connects/disconnects with
+jumper wires instead of a fresh solder joint every time:
+
+<p>
+  <img src="docs/Profi-5E_1.jpeg" width="440" alt="USB-TTL adapter connected via three jumper wires to pin headers soldered near the V.24 connector">
+  <img src="docs/Profi-5E_2.jpeg" width="440" alt="Close-up of the three soldered tap points on the board">
+</p>
+
+Green = SID, yellow = SOD, brown = GND, in both photos. Exact via locations
+are specific to this board revision — use the photos as a reference for the
+*technique* (solder a short pin into a via carrying the signal you need, so
+future connections are a jumper-wire plug rather than a new solder joint
+each time), not as exact coordinates to replicate blindly.
+
 There are two ways to use this project, needing different things installed:
 
 ## Just want to use it? (no assembler needed)
