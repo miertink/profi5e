@@ -17,14 +17,20 @@ serial framing): **[docs/Profi5E_Hardware_Reference.md](docs/Profi5E_Hardware_Re
    RAM, checksums it, and runs it.
 2. **`tools/profi5e_load.py`** — PC-side client. Sends a `.bin` with a
    sync/header/checksum frame over a serial port, waits for ACK/NAK, and
-   (by default) tells the board to run it immediately.
+   (by default) tells the board to run it immediately. Pass `--no-go` to
+   only load it into RAM without running it (the board returns to the
+   monitor instead), e.g. to start it later by hand (Hardware Reference
+   §5.3).
 3. **`tools/profi5e_build.py`** — assembles an `examples/*.asm` source for a
    chosen RAM address, so its output lines up with the `--addr` given to
    `profi5e_load.py`.
 4. **`examples/`** — small demo programs that exercise the loader end to
    end: two use only the onboard 7-segment display (`hiworld.asm`,
    `scroll_text.asm`); a third (`switch_leds.asm`) drives an external
-   switches/LEDs I/O board via the 64-pin expansion connector.
+   switches/LEDs I/O board via the 64-pin expansion connector; a fourth
+   (`light_show.asm`) is a demo reel that cycles through display/LED
+   effects, using the switches/LEDs board when present but running on the
+   base board alone otherwise.
 
 Not yet started: a BIN→WAV encoder for the monitor's cassette-tape format,
 as a hardware-free alternative loading path (see PROJECT.md Roadmap).
@@ -90,17 +96,24 @@ Reference §9).
    - **Switch 7/8** = desired baud rate, must match `--baud` below
    - **Switch 4 = OFF** for auto-boot into the loader on power-up (otherwise
      start it manually — Hardware Reference §5.3)
-3. Load a prebuilt example (one at a time — all three are built for the
+3. Load a prebuilt example (one at a time — all four are built for the
    same default address, 8000h):
    ```sh
    python tools/profi5e_load.py examples/hiworld.bin --port COM4 --addr 8000
    python tools/profi5e_load.py examples/scroll_text.bin --port COM4 --addr 8000
    python tools/profi5e_load.py examples/switch_leds.bin --port COM4 --addr 8000
+   python tools/profi5e_load.py examples/light_show.bin --port COM4 --addr 8000
    ```
    `switch_leds.bin` needs an external 8-switch/8-LED I/O board connected
    via the 64-pin expansion connector (populated only on full builds) — see
    Hardware Reference §3 "External I/O board" for the wiring it assumes.
-   The other two only need the base board.
+   `light_show.bin` writes to that same LED board when present but only
+   uses the display otherwise, so it runs fine on the base board too. The
+   other two only need the base board.
+
+   Pass `--no-go` to any of the commands above to load without auto-running
+   (e.g. to start it manually later via Hardware Reference §5.3's B/[addr]/S/G
+   sequence instead of immediately).
 
 ## Want to write or modify a program? (needs the assembler)
 

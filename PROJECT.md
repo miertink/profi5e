@@ -42,11 +42,20 @@ expansion socket) receives and checksums it → runs it automatically.
 - `examples/hiworld.asm`, `examples/scroll_text.asm` — display-only demo
   programs. `examples/switch_leds.asm` — mirrors an external I/O board's 8
   switches onto its 8 LEDs via the 64-pin connector (8255 #1, Hardware
-  Reference §3 "External I/O board").
-- Prebuilt `.bin`s committed for both the loader (both chip variants) and
-  all three examples, so burning the EPROM and loading the examples needs
-  no assembler at all — only Python (see README.md "Just want to use it?").
-  `asl`/`p2bin` are only needed to modify the loader or write new programs.
+  Reference §3 "External I/O board"). `examples/light_show.asm` — a demo
+  reel cycling through display/LED effects (spin, dual up/down counter,
+  chase, sparkle, flash); writes to the same LED board when present but
+  only needs the base board otherwise.
+- `loader/build_demo_rom.py` — packs the loader plus `hiworld`,
+  `scroll_text`, and `light_show` into a single EPROM image at fixed bus
+  addresses (2000h/2200h/2400h/2600h), so all four run directly from ROM
+  without serial loading (started manually via Hardware Reference §5.3's
+  B/[addr]/S/G sequence).
+- Prebuilt `.bin`s committed for the loader (both chip variants, standalone
+  and combined-demo-ROM) and all four examples, so burning the EPROM and
+  loading the examples needs no assembler at all — only Python (see
+  README.md "Just want to use it?"). `asl`/`p2bin` are only needed to
+  modify the loader or write new programs.
 - Local `asl`/`p2bin` toolchain built from source, installed at
   `C:\tools\asl\bin` (see Toolchain section).
 
@@ -78,7 +87,10 @@ profi5e/
 │   ├── loader.asm                  # serial loader, ORG 2000h — done, validated on hardware
 │   ├── loader_2764.bin             # prebuilt, 8 KB, for a 2764 (committed, no assembler needed)
 │   ├── loader_27128.bin            # prebuilt, 16 KB, for a 27128 (committed, no assembler needed)
-│   └── build.sh                    # asl → p2bin → 8 KB EPROM image (2764, default) or 16 KB (27128, `./build.sh 27128`)
+│   ├── loader_demo_2764.bin        # prebuilt combined EPROM: loader + 3 examples, 8 KB, for a 2764
+│   ├── loader_demo_27128.bin       # prebuilt combined EPROM: loader + 3 examples, 16 KB, for a 27128
+│   ├── build.sh                    # asl → p2bin → 8 KB EPROM image (2764, default) or 16 KB (27128, `./build.sh 27128`)
+│   └── build_demo_rom.py           # packs loader + hiworld/scroll_text/light_show into one EPROM image
 ├── tools/
 │   ├── dis85.py                    # 8085 disassembler used to produce the .lst
 │   ├── asm_build.sh                # generic asl/p2bin wrapper — used by loader/build.sh
@@ -92,7 +104,9 @@ profi5e/
     ├── scroll_text.asm             # scrolls "NOTHING IS CERTAIN" across the display, default ORG 8000h
     ├── scroll_text.bin             # prebuilt, for --addr 8000 (committed, no assembler needed)
     ├── switch_leds.asm             # mirrors an external I/O board's switches onto its LEDs, default ORG 8000h
-    └── switch_leds.bin             # prebuilt, for --addr 8000 (committed, no assembler needed)
+    ├── switch_leds.bin             # prebuilt, for --addr 8000 (committed, no assembler needed)
+    ├── light_show.asm              # display/LED demo reel, default ORG 8000h
+    └── light_show.bin              # prebuilt, for --addr 8000 (committed, no assembler needed)
 ```
 
 Both examples default to `ORG 8000h` via a `LOADADDR` EQU, not a hardcoded `ORG`.
@@ -154,7 +168,7 @@ every successful build, as a reminder.
 `loader/loader.asm` (protocol:
 `[55h sync][AAh][flags][addr_lo][addr_hi][len_lo][len_hi][payload…][chk]`,
 `chk` = sum mod 256 of the payload, ACK=06h/NAK=15h, `flags` bit0 = GO),
-`tools/profi5e_load.py`, and all three example programs.
+`tools/profi5e_load.py`, and all four example programs.
 
 **Phase 2:** `tools/bin2wav.py`, a BIN→WAV encoder for the monitor's
 cassette format, deriving exact timings from routines 0B80h/0C60h (already
